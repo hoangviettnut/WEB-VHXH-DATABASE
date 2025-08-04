@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Thống kê xã Xuân Quang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            color: #333;
+            background: url('Front END/background.jpg') center center/cover no-repeat fixed, linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #5a6c7d;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            height: calc(100vh - 200px);
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+            padding-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .table-list {
+            list-style: none;
+        }
+
+        .table-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin-bottom: 12px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateX(8px) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .table-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateX(5px);
+        }
+
+        .table-item button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .table-item.active button {
+            color: white;
+        }
+
+        .table-section-header {
+            margin: 20px 0 10px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .table-section-header span {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 0;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 10px;
+        }
+
+        .table-separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #3498db, transparent);
+            margin: 15px 0;
+            list-style: none;
+        }
+
+        .main-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+        }
+
+        .content-header h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #0f8a7d 0%, #2dd66b 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #e6395c 0%, #e63a1a 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d882e1 0%, #d54d5d 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table tr:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            margin: 5% auto;
+            padding: 35px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-header h3 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .no-data i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-database"></i>
+                Admin Dashboard
+            </h1>
+            <p>Quản lý dữ liệu thống kê xã Xuân Quang</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3><i class="fas fa-table"></i> Danh sách bảng</h3>
+                <ul class="table-list" id="tableList">
+                    <!-- Tables will be loaded here -->
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="content-header">
+                    <h2 id="currentTableName">Chọn bảng để quản lý</h2>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="addRecordBtn" style="display: none;">
+                            <i class="fas fa-plus"></i> Thêm mới
+                        </button>
+                        <button class="btn btn-warning" id="refreshBtn" style="display: none;">
+                            <i class="fas fa-sync"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+
+                <div id="alertContainer"></div>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Đang tải dữ liệu...</p>
+                </div>
+
+                <div id="tableContainer">
+                    <div class="no-data">
+                        <i class="fas fa-database"></i>
+                        <h3>Chưa chọn bảng</h3>
+                        <p>Vui lòng chọn một bảng từ danh sách bên trái để bắt đầu quản lý dữ liệu</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Thêm bản ghi mới</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <form id="recordForm">
+                <div id="formFields">
+                    <!-- Form fields will be generated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="cancelBtn">Hủy</button>
+                    <button type="submit" class="btn btn-success" id="saveBtn">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Xác nhận xóa</h3>
+                <span class="close" id="closeDeleteModal">&times;</span>
+            </div>
+            <div style="padding: 20px 0;">
+                <p>Bạn có chắc chắn muốn xóa bản ghi này không?</p>
+                <p style="color: #e74c3c; font-weight: bold;">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="cancelDeleteBtn">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTable = null;
+        let currentData = [];
+        let editingRecord = null;
+
+        // API Base URL
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Global error handler - QUAN TRỌNG: Bắt lỗi JavaScript
+        window.addEventListener('error', function(e) {
+            console.error('❌ GLOBAL ERROR:', e.error);
+            console.error('❌ Error message:', e.message);
+            console.error('❌ Error filename:', e.filename);
+            console.error('❌ Error line:', e.lineno);
+            alert('Có lỗi JavaScript xảy ra: ' + e.message);
+        });
+
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('❌ UNHANDLED PROMISE REJECTION:', e.reason);
+            alert('Có lỗi Promise chưa xử lý: ' + e.reason);
+        });
+
+        // Column name mapping - Chuyển đổi tên cột từ database sang tiếng Việt có dấu
+        const COLUMN_MAPPING = {
+            // Bảng 1. Chỉ số tổng quan của xã
+            'Dien_tich': 'Diện tích',
+            'Dan_so': 'Dân số',
+            'Tong_so_dan_toc': 'Tổng số dân tộc',
+            'Ton_giao': 'Tôn giáo',
+
+            // Bảng 1.1. Dân số của các dân tộc
+            'STT': 'STT',
+            'Ten_dan_toc': 'Tên dân tộc',
+            'So_luong': 'Số lượng',
+
+            // Bảng 2. Kinh tế
+            'So_ho_ngheo': 'Số hộ nghèo',
+            'So_ho_can_ngheo': 'Số hộ cận nghèo',
+            'Thu_nhap_binh_quan': 'Thu nhập bình quân',
+            'So_thon': 'Số thôn',
+            'So_ho_kinh_doanh_nho_le': 'Số hộ kinh doanh nhỏ lẻ',
+
+            // Bảng 2.1. Thôn và HTX
+            'Ten_thon': 'Tên thôn',
+            'So_HTX': 'Số HTX',
+            'Quy_mo': 'Quy mô',
+            'Linh_vuc_hoat_dong': 'Lĩnh vực hoạt động',
+            'Mo_hinh_kinh_te_hieu_qua': 'Mô hình kinh tế hiệu quả',
+
+            // Bảng 3. Y tế
+            'So_tram_y_te': 'Số trạm y tế',
+            'So_phong_kham_tu_nhan': 'Số phòng khám tư nhân',
+            'So_luong_can_bo_y_te': 'Số lượng cán bộ y tế',
+            'Ty_le_nguoi_dan_tham_gia_BHYT': 'Tỷ lệ người dân tham gia BHYT',
+
+            // Bảng 4. Giáo dục
+            'Tong_so_truong_hoc': 'Tổng số trường học',
+            'Tong_so_hoc_sinh': 'Tổng số học sinh',
+            'Truong_chuan_QG': 'Trường chuẩn QG',
+
+            // Bảng 4.1. Thông tin các trường học
+            'Ten_truong': 'Tên trường',
+            'Cap_truong': 'Cấp trường',
+            'So_luong_hoc_sinh_cua_truong': 'Số lượng học sinh của trường',
+            'Dat_chuan_QG': 'Đạt chuẩn QG',
+
+            // Bảng 5. Cơ sở hạ tầng
+            'Duong_GTNT_duoc_cung_hoa': 'Đường GTNT được cứng hóa',
+            'Cho': 'Chợ',
+            'Buu_dien': 'Bưu điện',
+            'Nha_van_hoa': 'Nhà văn hóa',
+            'Ngan_hang': 'Ngân hàng',
+            'Ty_le_su_dung_dien_an_toan': 'Tỷ lệ sử dụng điện an toàn',
+            'Ty_le_su_dung_nuoc_sach': 'Tỷ lệ sử dụng nước sạch',
+
+            // Bảng 6. Công nghệ số
+            'Dich_vu_cong_truc_tuyen': 'Dịch vụ công trực tuyến',
+            'Doi_cong_nghe_so_cong_dong': 'Đội công nghệ số cộng đồng',
+            'Ty_le_ho_gia_dinh_co_dien_thoai_di_dong': 'Tỷ lệ hộ gia đình có điện thoại di động',
+            'Ty_le_ho_gia_dinh_truy_cap_internet': 'Tỷ lệ hộ gia đình truy cập internet',
+            'So_nguoi_biet_su_dung_cong_nghe_so': 'Số người biết sử dụng công nghệ số',
+
+            // Các tên cột khác có thể xuất hiện
+            'ID': 'ID',
+            'id': 'ID'
+        };
+
+        // Function to get Vietnamese column name
+        function getVietnameseColumnName(columnName) {
+            return COLUMN_MAPPING[columnName] || columnName;
+        }
+
+        // Function to get column order for each table
+        function getColumnOrder(tableName) {
+            const columnOrders = {
+                '1. Chỉ số tổng quan của xã': ['Dien_tich', 'Dan_so', 'Tong_so_dan_toc', 'Ton_giao'],
+                '1.1. Dân số của các dân tộc': ['STT', 'Ten_dan_toc', 'So_luong'],
+                '2. Kinh tế': ['So_ho_ngheo', 'So_ho_can_ngheo', 'Thu_nhap_binh_quan', 'So_thon', 'So_ho_kinh_doanh_nho_le'],
+                '2.1. Thôn và HTX': ['STT', 'Ten_thon', 'So_HTX', 'Quy_mo', 'Linh_vuc_hoat_dong', 'Mo_hinh_kinh_te_hieu_qua'],
+                '3. Y tế ': ['So_tram_y_te', 'So_phong_kham_tu_nhan', 'So_luong_can_bo_y_te', 'Ty_le_nguoi_dan_tham_gia_BHYT'],
+                '4. Giáo Dục': ['Tong_so_truong_hoc', 'Tong_so_hoc_sinh', 'Truong_chuan_QG'],
+                '4.1. Thông tin các trường học.': ['STT', 'Ten_truong', 'Cap_truong', 'So_luong_hoc_sinh_cua_truong', 'Dat_chuan_QG'],
+                '5. Cơ sở hạ tầng': ['Duong_GTNT_duoc_cung_hoa', 'Cho', 'Buu_dien', 'Nha_van_hoa', 'Ngan_hang', 'Ty_le_su_dung_dien_an_toan', 'Ty_le_su_dung_nuoc_sach'],
+                '6. Công nghệ số': ['Dich_vu_cong_truc_tuyen', 'Doi_cong_nghe_so_cong_dong', 'Ty_le_ho_gia_dinh_co_dien_thoai_di_dong', 'Ty_le_ho_gia_dinh_truy_cap_internet', 'So_nguoi_biet_su_dung_cong_nghe_so']
+            };
+            
+            return columnOrders[tableName] || [];
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTables();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Modal controls
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
+            document.getElementById('saveBtn').addEventListener('click', saveRecord);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+            // Prevent form submission - QUAN TRỌNG: Ngăn form submit mặc định
+            document.getElementById('recordForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Ngăn form submit mặc định
+                console.log('=== FORM SUBMIT PREVENTED ===');
+                // KHÔNG gọi saveRecord() ở đây nữa vì đã có event listener cho saveBtn
+            });
+
+            // Action buttons
+            document.getElementById('addRecordBtn').addEventListener('click', showAddModal);
+            document.getElementById('refreshBtn').addEventListener('click', loadTableData);
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    closeModal();
+                    closeDeleteModal();
+                }
+            });
+        }
+
+        async function loadTables() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/tables`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayTables(result.data);
+                } else {
+                    showAlert('Lỗi khi tải danh sách bảng: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Lỗi kết nối: ' + error.message, 'error');
+            }
+        }
+
+        function displayTables(tables) {
+            const tableList = document.getElementById('tableList');
+            tableList.innerHTML = '';
+
+            // Define main tables and sub tables
+            const mainTables = [
+                'Chỉ số tổng quan của xã',
+                'Kinh tế', 
+                'Y tế',
+                'Giáo dục',
+                'Cơ sở hạ tầng',
+                'Công nghệ số'
+            ];
+
+            let mainTablesAdded = false;
+            let subTablesAdded = false;
+
+            tables.forEach(table => {
+                const isMainTable = mainTables.includes(table.display_name);
+                
+                // Add separator between main tables and sub tables
+                if (isMainTable && !mainTablesAdded) {
+                    // Add main tables section header
+                    const headerLi = document.createElement('li');
+                    headerLi.className = 'table-section-header';
+                    headerLi.innerHTML = '<span>Bảng chính</span>';
+                    tableList.appendChild(headerLi);
+                    mainTablesAdded = true;
+                } else if (!isMainTable && !subTablesAdded && mainTablesAdded) {
+                    // Add separator between main and sub tables
+                    const separatorLi = document.createElement('li');
+                    separatorLi.className = 'table-separator';
+                    tableList.appendChild(separatorLi);
+                    
+                    // Add sub tables section header
+                    const subHeaderLi = document.createElement('li');
+                    subHeaderLi.className = 'table-section-header';
+                    subHeaderLi.innerHTML = '<span>Bảng chi tiết</span>';
+                    tableList.appendChild(subHeaderLi);
+                    subTablesAdded = true;
+                }
+
+                const li = document.createElement('li');
+                li.className = 'table-item';
+                
+                const button = document.createElement('button');
+                button.textContent = table.display_name;
+                button.addEventListener('click', () => selectTable(table.name, table.display_name));
+                
+                li.appendChild(button);
+                tableList.appendChild(li);
+            });
+        }
+
+        async function selectTable(tableName, displayName) {
+            currentTable = tableName;
+            
+            // Update UI
+            document.getElementById('currentTableName').textContent = displayName;
+            document.getElementById('refreshBtn').style.display = 'inline-flex';
+
+            // Check if this is a main table (only 1 row allowed) or sub table (multiple rows allowed)
+            const mainTables = [
+                '1. Chỉ số tổng quan của xã',
+                '2. Kinh tế',
+                '3. Y tế ',
+                '4. Giáo Dục',
+                '5. Cơ sở hạ tầng',
+                '6. Công nghệ số'
+            ];
+            
+            const isMainTable = mainTables.includes(tableName);
+            document.getElementById('addRecordBtn').style.display = isMainTable ? 'none' : 'inline-flex';
+
+            // Update active state
+            document.querySelectorAll('.table-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.table-item').classList.add('active');
+
+            // Load table data
+            await loadTableData();
+        }
+
+        async function loadTableData() {
+            if (!currentTable) return;
+
+            console.log('=== DEBUG LOAD TABLE DATA ===');
+            console.log('Loading data for table:', currentTable);
+
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/table/${encodeURIComponent(currentTable)}`);
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response result:', result);
+
+                if (result.success) {
+                    console.log('✅ Data loaded successfully');
+                    currentData = result.data;
+                    displayTableData(result.data);
+                } else {
+                    console.log('❌ Failed to load data:', result.message);
+                    showAlert('Lỗi khi tải dữ liệu: ' + result.message, 'error');
+                    showNoData();
+                }
+            } catch (error) {
+                console.log('❌ Connection error:', error.message);
+                showAlert('Lỗi kết nối: ' + error.message, 'error');
+                showNoData();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayTableData(data) {
+            const container = document.getElementById('tableContainer');
+            
+            if (!data || data.length === 0) {
+                showNoData();
+                return;
+            }
+
+            // Create search box
+            const searchBox = document.createElement('div');
+            searchBox.className = 'search-box';
+            searchBox.innerHTML = `
+                <input type="text" id="searchInput" placeholder="Tìm kiếm trong bảng...">
+            `;
+
+            // Create table
+            const table = document.createElement('table');
+            table.className = 'data-table';
+
+            // Create header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            // Get column order based on current table
+            const columnOrder = getColumnOrder(currentTable);
+            
+            // Use column order if available, otherwise use Object.keys
+            const columns = columnOrder.length > 0 ? columnOrder : Object.keys(data[0]);
+            
+            // Lọc bỏ cột ID/STT khỏi hiển thị
+            const displayColumns = columns.filter(col => col.toUpperCase() !== 'ID' && col.toUpperCase() !== 'STT');
+            
+            displayColumns.forEach(key => {
+                const th = document.createElement('th');
+                th.textContent = getVietnameseColumnName(key);
+                headerRow.appendChild(th);
+            });
+
+            // Add action column
+            const actionTh = document.createElement('th');
+            actionTh.textContent = 'Thao tác';
+            headerRow.appendChild(actionTh);
+
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create body
+            const tbody = document.createElement('tbody');
+            
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                
+                // Use same column order as header (không bao gồm ID)
+                displayColumns.forEach(key => {
+                    const td = document.createElement('td');
+                    td.textContent = row[key] || '';
+                    tr.appendChild(td);
+                });
+
+                // Add action buttons
+                const actionTd = document.createElement('td');
+                actionTd.className = 'action-cell';
+                
+                // Check if this is a main table (only edit allowed, no delete)
+                const mainTables = [
+                    '1. Chỉ số tổng quan của xã',
+                    '2. Kinh tế',
+                    '3. Y tế ',
+                    '4. Giáo Dục',
+                    '5. Cơ sở hạ tầng',
+                    '6. Công nghệ số'
+                ];
+                
+                const isMainTable = mainTables.includes(currentTable);
+                
+                if (isMainTable) {
+                    // For main tables, only show edit button
+                    actionTd.innerHTML = `
+                        <button class="btn btn-primary btn-sm" onclick="editRecord(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    `;
+                } else {
+                    // For sub tables, show both edit and delete buttons
+                    actionTd.innerHTML = `
+                        <button class="btn btn-primary btn-sm" onclick="editRecord(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                }
+                tr.appendChild(actionTd);
+
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+
+            // Clear container and add new content
+            container.innerHTML = '';
+            container.appendChild(searchBox);
+            container.appendChild(table);
+
+            // Add search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = tbody.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        }
+
+        function showNoData() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = `
+                <div class="no-data">
+                    <i class="fas fa-database"></i>
+                    <h3>Không có dữ liệu</h3>
+                    <p>Bảng này hiện không có dữ liệu hoặc có lỗi khi tải</p>
+                </div>
+            `;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            // Tạo icon cho alert
+            const icon = document.createElement('i');
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+                alert.style.color = '#155724';
+                alert.style.backgroundColor = '#d4edda';
+                alert.style.borderColor = '#c3e6cb';
+            } else {
+                icon.className = 'fas fa-exclamation-triangle';
+                alert.style.color = '#721c24';
+                alert.style.backgroundColor = '#f8d7da';
+                alert.style.borderColor = '#f5c6cb';
+            }
+            
+            // Tạo nội dung alert
+            const content = document.createElement('span');
+            content.textContent = message;
+            content.style.marginLeft = '10px';
+            
+            alert.appendChild(icon);
+            alert.appendChild(content);
+            container.appendChild(alert);
+
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        function showAddModal() {
+            console.log('=== SHOW ADD MODAL ===');
+            editingRecord = null;
+            document.getElementById('modalTitle').textContent = 'Thêm bản ghi mới';
+            generateFormFields();
+            document.getElementById('recordModal').style.display = 'block';
+            console.log('✅ Add modal displayed');
+        }
+
+        function editRecord(index) {
+            console.log('=== EDIT RECORD ===');
+            console.log('Index:', index);
+            console.log('Current data:', currentData);
+            editingRecord = currentData[index];
+            console.log('Editing record:', editingRecord);
+            document.getElementById('modalTitle').textContent = 'Chỉnh sửa bản ghi';
+            generateFormFields(editingRecord);
+            document.getElementById('recordModal').style.display = 'block';
+            console.log('✅ Edit modal displayed');
+        }
+
+        function deleteRecord(index) {
+            editingRecord = currentData[index];
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function generateFormFields(data = null) {
+            console.log('=== GENERATE FORM FIELDS ===');
+            console.log('Data parameter:', data);
+            console.log('Current data:', currentData);
+            
+            const container = document.getElementById('formFields');
+            container.innerHTML = '';
+
+            if (!currentData || currentData.length === 0) {
+                console.log('❌ No current data available');
+                return;
+            }
+
+            // Get column order based on current table
+            const columnOrder = getColumnOrder(currentTable);
+            
+            // Use column order if available, otherwise use Object.keys
+            const columns = columnOrder.length > 0 ? columnOrder : Object.keys(currentData[0]);
+            
+            columns.forEach(key => {
+                // Bỏ qua cột ID/STT khi tạo form
+                if (key.toUpperCase() === 'ID' || key.toUpperCase() === 'STT') return;
+                
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+                
+                const label = document.createElement('label');
+                label.textContent = getVietnameseColumnName(key);
+                label.setAttribute('for', key);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = key;
+                input.name = key;
+                input.required = true;
+                
+                if (data && data[key] !== undefined) {
+                    input.value = data[key];
+                }
+                
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                container.appendChild(formGroup);
+            });
+        }
+
+        // Function to validate data before sending
+        function validateData(data) {
+            const errors = [];
+            
+            // Kiểm tra các trường bắt buộc
+            for (const [key, value] of Object.entries(data)) {
+                if (!value || value.toString().trim() === '') {
+                    errors.push(`Trường "${getVietnameseColumnName(key)}" không được để trống`);
+                }
+            }
+            
+            // Kiểm tra kiểu dữ liệu số cho các trường cụ thể
+            const numericFields = [
+                'Dien_tich', 'Dan_so', 'Tong_so_dan_toc', 'So_ho_ngheo', 'So_ho_can_ngheo',
+                'Thu_nhap_binh_quan', 'So_thon', 'So_ho_kinh_doanh_nho_le', 'So_luong',
+                'So_tram_y_te', 'So_phong_kham_tu_nhan', 'So_luong_can_bo_y_te',
+                'Ty_le_nguoi_dan_tham_gia_BHYT', 'Tong_so_truong_hoc', 'Tong_so_hoc_sinh',
+                'Truong_chuan_QG', 'So_luong_hoc_sinh_cua_truong', 'Duong_GTNT_duoc_cung_hoa',
+                'Cho', 'Buu_dien', 'Nha_van_hoa', 'Ngan_hang', 'Ty_le_su_dung_dien_an_toan',
+                'Ty_le_su_dung_nuoc_sach', 'Doi_cong_nghe_so_cong_dong',
+                'Ty_le_ho_gia_dinh_co_dien_thoai_di_dong', 'Ty_le_ho_gia_dinh_truy_cap_internet',
+                'So_nguoi_biet_su_dung_cong_nghe_so', 'So_HTX'
+            ];
+            
+            for (const field of numericFields) {
+                if (data[field] && isNaN(parseFloat(data[field]))) {
+                    errors.push(`Trường "${getVietnameseColumnName(field)}" phải là số`);
+                }
+            }
+            
+            return errors;
+        }
+
+        async function saveRecord() {
+            console.log('=== SAVE RECORD FUNCTION CALLED ===');
+            console.log('Timestamp:', new Date().toISOString());
+            console.log('Call stack:', new Error().stack);
+            
+            const form = document.getElementById('recordForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Lấy dữ liệu từ form
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // Debug logging
+            console.log('=== DEBUG SAVE RECORD ===');
+            console.log('Current table:', currentTable);
+            console.log('Editing record:', editingRecord);
+            console.log('Form data:', data);
+
+            // Validate data
+            const validationErrors = validateData(data);
+            if (validationErrors.length > 0) {
+                showAlert('Lỗi validation: ' + validationErrors.join(', '), 'error');
+                return;
+            }
+
+            try {
+                let response;
+                if (editingRecord) {
+                    // Update existing record
+                    const updateData = {
+                        data: data
+                    };
+                    
+                    // Chỉ thêm ID nếu bảng có cột ID
+                    const mainTables = [
+                        '1. Chỉ số tổng quan của xã',
+                        '2. Kinh tế',
+                        '3. Y tế ',
+                        '4. Giáo Dục',
+                        '5. Cơ sở hạ tầng',
+                        '6. Công nghệ số'
+                    ];
+                    
+                    const isMainTable = mainTables.includes(currentTable);
+                    if (!isMainTable && (editingRecord.ID || editingRecord.id)) {
+                        updateData.id = editingRecord.ID || editingRecord.id;
+                    }
+                    
+                    console.log('Sending update request with data:', updateData);
+                    response = await fetch(`${API_BASE}/admin/table/${encodeURIComponent(currentTable)}/update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                } else {
+                    // Add new record
+                    // Loại bỏ cột ID/STT khỏi dữ liệu nếu là bảng con
+                    const mainTables = [
+                        '1. Chỉ số tổng quan của xã',
+                        '2. Kinh tế',
+                        '3. Y tế ',
+                        '4. Giáo Dục',
+                        '5. Cơ sở hạ tầng',
+                        '6. Công nghệ số'
+                    ];
+                    
+                    const isMainTable = mainTables.includes(currentTable);
+                    const insertData = { ...data };
+                    
+                    // Nếu là bảng con, loại bỏ cột ID/STT khỏi dữ liệu
+                    if (!isMainTable) {
+                        delete insertData.ID;
+                        delete insertData.id;
+                        delete insertData.STT;
+                        delete insertData.stt;
+                        console.log('Đã loại bỏ cột ID/STT khỏi dữ liệu thêm mới');
+                    }
+                    
+                    console.log('Sending insert request with data:', { data: insertData });
+                    response = await fetch(`${API_BASE}/admin/table/${encodeURIComponent(currentTable)}/insert`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            data: insertData
+                        })
+                    });
+                }
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response result:', result);
+
+                if (result.success) {
+                    console.log('✅ Update successful!');
+                    showAlert(result.message, 'success');
+                    closeModal();
+                    await loadTableData();
+                } else {
+                    console.log('❌ Update failed:', result.message);
+                    showAlert('Lỗi: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ ERROR IN SAVE RECORD:', error);
+                showAlert('Lỗi kết nối: ' + error.message, 'error');
+            }
+        }
+
+        async function confirmDelete() {
+            if (!editingRecord) return;
+
+            console.log('=== CONFIRM DELETE ===');
+            console.log('Editing record:', editingRecord);
+            console.log('Current table:', currentTable);
+
+            // Xác định ID để xóa - có thể là ID, id, STT, hoặc stt
+            const deleteId = editingRecord.ID || editingRecord.id || editingRecord.STT || editingRecord.stt;
+            
+            if (!deleteId) {
+                console.error('❌ Không tìm thấy ID để xóa');
+                showAlert('Lỗi: Không tìm thấy ID để xóa', 'error');
+                return;
+            }
+
+            console.log('Delete ID:', deleteId);
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/table/${encodeURIComponent(currentTable)}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: deleteId
+                    })
+                });
+
+                console.log('Delete response status:', response.status);
+                const result = await response.json();
+                console.log('Delete response result:', result);
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    closeDeleteModal();
+                    await loadTableData();
+                } else {
+                    showAlert('Lỗi: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ ERROR IN CONFIRM DELETE:', error);
+                showAlert('Lỗi kết nối: ' + error.message, 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('recordModal').style.display = 'none';
+            document.getElementById('recordForm').reset();
+            editingRecord = null;
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            editingRecord = null;
+        }
+    </script>
+</body>
+</html>
