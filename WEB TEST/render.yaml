@@ -2,7 +2,7 @@ services:
   - type: web
     name: xuan-quang-stats
     env: python
-    buildCommand: chmod +x build.sh && ./build.sh
+    buildCommand: pip install -r /opt/render/project/src/requirements.txt
     startCommand: python app.py
     envVars:
       - key: DATABASE_URL
